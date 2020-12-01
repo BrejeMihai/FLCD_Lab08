@@ -1,9 +1,12 @@
 import sys
-from Grammar import Grammar
+from Grammar import Grammar, Lr0Parser
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     gr = Grammar()
-    gr.read_from_file(sys.argv[1])
+    #gr.read_from_file(sys.argv[1])
+    gr.read_from_file("C:\\Users\\Breje\\Desktop\\g1.txt")
     print(gr)
-    print(gr.get_productions_for_nonterminal("simpelStmt"))
+    #print(gr.get_productions_for_nonterminal("simpelStmt"))
+    parser = Lr0Parser(gr)
+    parser.canonical_collection()
+

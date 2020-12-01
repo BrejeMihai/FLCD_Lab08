@@ -1,4 +1,5 @@
 from collections import defaultdict
+from copy import deepcopy
 
 class Grammar(object):
 
@@ -11,19 +12,19 @@ class Grammar(object):
     def __str__(self):
         stringu = "The grammar is:\nSet of terminals= "
         for c in self.terminals:
-            stringu+=c + " "
-        stringu+="\nSet of non terminals= "
+            stringu += c + " "
+        stringu += "\nSet of non terminals= "
         for c in self.non_terminals:
-            stringu+=c + " "
-        stringu+="\nThe productions:\n"
+            stringu += c + " "
+        stringu += "\nThe productions:\n"
         for non_term in self.productions:
             prods = self.productions[non_term]
-            stringu+= str(non_term) + "-> "
+            stringu += str(non_term) + "-> "
             for element in prods:
-                stringu+=str(element) + " | "
+                stringu += str(element) + " | "
             if len(prods) != 0:
                 stringu = stringu[:-3]
-            stringu+="\n"
+            stringu += "\n"
         return stringu
 
     def get_productions_for_nonterminal(self, non_terminal):
@@ -41,13 +42,13 @@ class Grammar(object):
 
             line = f.readline()
             for c in line.split(" "):
-                self.non_terminals.append(c)
+                self.non_terminals.append(c.strip("\n\r"))
             if self.starting_symbol not in self.non_terminals:
                 raise Exception("No start symbol given! Bad grammar!")
 
             line = f.readline()
             for c in line.split(" "):
-                self.terminals.append(c)
+                self.terminals.append(c.strip("\n\r"))
             lines = f.readlines()
             for line in lines:
                 non_term, prods = line.split(" ", 1)
@@ -58,3 +59,193 @@ class Grammar(object):
                     prod = "\"" + prod + "\""
                     self.productions[non_term].append(prod)
 
+
+
+class Lr0Parser(object):
+    def __init__(self, grammar):
+        self.grammar = grammar
+        self.terminals = grammar.terminals
+        self.non_terminals = grammar.non_terminals
+        self.productions = grammar.productions
+        self.starting_symbol = grammar.starting_symbol
+        self.augmented_grammar = None
+        self.dotted_productions = None
+        self.user_friendly_productions()
+        self.start_magic()
+
+    def start_magic(self):
+        self.augment_grammar()
+        self.initial_closure = {"S\'" : self.dotted_productions['S\'']}
+        self.closure(self.dotted_productions['S\''][0], self.initial_closure, self.dotted_productions)
+
+    def augment_grammar(self):
+        self.dotted_productions = defaultdict(list)
+
+        self.dotted_productions['S\''].append(". " + self.grammar.starting_symbol)  # augmented start
+
+        for non_terminal in self.productions:
+            self.dotted_productions[non_terminal] = []
+            for production in self.productions[non_terminal]:
+                self.dotted_productions[non_terminal] \
+                    .append(". "
+                            + production.replace('\"', ""))  # eliminating double quotations
+
+    def user_friendly_productions(self):
+        self.uf_productions = []
+        for x in self.productions:
+            for productions in self.productions[x]:
+                self.uf_productions.append([x] + [lmbd.strip("\"") for lmbd in productions.split(" ")])
+
+    def closure(self, element, closure_history, transition_history):
+        #element = element[0]
+        dot_index = element.index('.')
+        if "." == element[-1]:
+            return
+
+        next_space = element.find(" ", dot_index+2)
+        if next_space == -1:
+            element_after_dot = element[dot_index + 2: ]
+        else:
+            element_after_dot = element[dot_index + 2: next_space]
+
+        if element_after_dot in self.non_terminals:
+            non_terminal = element_after_dot
+
+            if non_terminal not in closure_history:
+                closure_history[non_terminal] = transition_history[non_terminal]
+            else:
+                closure_history[non_terminal] += transition_history[non_terminal]
+            for transition in transition_history[non_terminal]:
+                self.closure(transition, closure_history, transition_history)
+
+    def shift_dot(self, transition_ref):
+        transition = deepcopy(transition_ref)
+        dot_index = transition.index(".")
+
+        if transition[-1] == ".":
+            raise Exception("No more shifting available!")
+
+        transition_after_dot = transition[dot_index + 1 if transition[dot_index+1] != " " else dot_index+2 : ]
+        transition_before_dot = transition[: dot_index]
+
+        find_space_after_dot = transition_after_dot.find(" ")
+        if -1 != find_space_after_dot:
+            first_element_after_dot = transition_after_dot[:find_space_after_dot]
+            rest_after_dot = transition_after_dot[find_space_after_dot+1:]
+        else:
+            first_element_after_dot = transition_after_dot
+            rest_after_dot = ""
+
+        shifted_transition = transition_before_dot + " " + first_element_after_dot + " . " + rest_after_dot
+
+        return shifted_transition.strip(" \n\r")
+
+    def goto(self, initial_transition, key, state, parent=-1):
+
+        shifted_transition = self.shift_dot(state)
+        closure_history = {key: [shifted_transition]}
+
+        self.closure(shifted_transition, closure_history, initial_transition)
+
+        # space_before_dot = shifted_transition.index('.')-1#shifted_transition.rfind(" ", 0, shifted_transition.index(".")-1)
+        # if -1 != space_before_dot:
+        #     before_dot = shifted_transition[:space_before_dot]
+        # else:
+        #     before_dot = shifted_transition[:shifted_transition.index(".")-1]
+        # parent_key = before_dot
+        dot_index = shifted_transition.index(".")
+        space_before_dot = shifted_transition.rfind(" ", 0, dot_index-1)
+        if -1 != space_before_dot:
+            element_before_dot = shifted_transition[space_before_dot+1:dot_index-1]
+        else:
+            element_before_dot = shifted_transition[:dot_index-1]
+        parent_key = element_before_dot
+
+        self.queue.append({
+            "state": closure_history,
+            "initial_dotted": initial_transition,
+            "parent": parent,
+            "parent_key": parent_key
+        })
+
+    def goto_all(self, state, initial_dotted, parent=-1, parent_key="-1"):
+        if state not in self.states:
+            self.states.append(state)
+            index = len(self.states) - 1
+            self.state_parents[index] = {
+                "parent_index": parent,
+                "before_dot": parent_key
+            }
+            self.pretty_print(state, "state {}".format(index))
+            for key in state:
+                for transition in state[key]:
+                    if transition[-1] != '.':
+                        self.goto(initial_dotted, key, transition, index)
+        else:
+            if parent in self.inner_table_values:
+                if parent_key in self.non_terminals:
+                    self.inner_table_values[parent][parent_key] = "{}".format(self.states.index(state))
+                else:
+                    self.inner_table_values[parent][parent_key] = "s{}".format(self.states.index(state))
+            else:
+                if parent_key in self.non_terminals:
+                    self.inner_table_values[parent] = {parent_key: "{}".format(self.states.index(state))}
+                else:
+                    self.inner_table_values[parent] = {parent_key: "s{}".format(self.states.index(state))}
+
+    def get_reduced(self):
+        self.reduced = {}
+        for state in self.states:
+            state_key = list(state.keys())[0]
+            if len(state) == 1 and len(state[state_key]) and len(state[state_key][0]) \
+                    and state[state_key][0][-1] == ".":
+                self.reduced[self.states.index(state)] = state
+        return self.reduced
+
+    def canonical_collection(self):
+        self.inner_table_values = {}
+        self.queue = [{
+            "state": self.initial_closure,
+            "initial_dotted": self.dotted_productions,
+        }]
+        self.states = []
+        self.state_parents = {}
+        while len(self.queue) > 0:
+            self.goto_all(**self.queue.pop(0))
+        reduced = self.get_reduced()
+        for k in reduced:
+            red_k = list(reduced[k].keys())
+            if red_k[0] != "S'":
+                trans = red_k + [lmbd for lmbd in reduced[k][red_k[0]][0][:-1].split(" ")]
+                transClean = []
+                for x in trans:
+                    if x != '':
+                        transClean.append(x)
+
+                reduce_index = self.uf_productions.index(transClean) + 1
+#                reduce_index = self.productions[red_k[0]].index(trans) + 1
+                self.inner_table_values[k] = { terminal: "r{}".format(reduce_index) for terminal in self.terminals}
+                self.inner_table_values[k]["$"] = "r{}".format(reduce_index)
+            else:
+                self.inner_table_values[k] = {"$": "accept"}
+        del self.state_parents[0]
+        for key in self.state_parents:
+            parent = self.state_parents[key]
+            if parent["parent_index"] in self.inner_table_values:
+                if parent["before_dot"] in self.non_terminals:
+                    self.inner_table_values[parent["parent_index"]][parent["before_dot"]] = "{}".format(key)
+                else:
+                    self.inner_table_values[parent["parent_index"]][parent["before_dot"]] = "s{}".format(key)
+            else:
+                if parent["before_dot"] in self.non_terminals:
+                    self.inner_table_values[parent["parent_index"]] = {parent["before_dot"]: "{}".format(key)}
+                else:
+                    self.inner_table_values[parent["parent_index"]] = {parent["before_dot"]: "s{}".format(key)}
+        table = {"I{}".format(index): self.inner_table_values[index] for index in range(len(self.states))}
+        self.pretty_print(table, "Table:")
+
+    def pretty_print(self, map, message=None, deepness=""):
+        if message is not None:
+            print(deepness + message)
+        for key in map:
+            print(f"{deepness}{key} : {map[key]}")
