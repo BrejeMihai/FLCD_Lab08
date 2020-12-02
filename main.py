@@ -3,13 +3,10 @@ from Grammar import Grammar, Lr0Parser
 
 if __name__ == '__main__':
     gr = Grammar()
-    #gr.read_from_file(sys.argv[1])
-    gr.read_from_file("C:\\Users\\Breje\\Desktop\\g1.txt")
+    gr.read_from_file(sys.argv[1])
     print(gr)
-    #print(gr.get_productions_for_nonterminal("simpelStmt"))
     parser = Lr0Parser(gr)
     parser.canonical_collection()
-    #parser.actual_parsing(['b','a','a','b'])
 
     _menu_string = "Choose an option:\n1.Show the grammar details.\n2.Show productions for nonterminal.\n3.Show parsing table.\n4.Parse word\n0.Exit"
     end = False
@@ -25,10 +22,10 @@ if __name__ == '__main__':
         elif option == 3:
             parser.show_parsing_table()
         elif option == 4:
-            word = input("Enter word >>> ")
+            word = input("Enter sequence >>> ")
             lista = word.split(" ")
             if len(lista) > 1:
-                raise Exception("Single word accepted")
+                raise Exception("Sequence not accepted")
             proper_form_word = [x for x in word]
             parser.actual_parsing(proper_form_word)
         elif option == 0:

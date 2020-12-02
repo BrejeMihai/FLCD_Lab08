@@ -1,0 +1,17 @@
+The grammar is:
+Set of terminals= a b 
+Set of non terminals= S X 
+The productions:
+S-> "X X"
+X-> "a X" | "b"
+
+Parsing table:
+I0 : {'S': '1', 'X': '2', 'a': 's3', 'b': 's4'}
+I1 : {'$': 'accept'}
+I2 : {'a': 's3', 'b': 's4', 'X': '5'}
+I3 : {'a': 's3', 'b': 's4', 'X': '6'}
+I4 : {'a': 'r3', 'b': 'r3', '$': 'r3'}
+I5 : {'a': 'r1', 'b': 'r1', '$': 'r1'}
+I6 : {'a': 'r2', 'b': 'r2', '$': 'r2'}
+
+
