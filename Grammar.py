@@ -1,5 +1,6 @@
 from collections import defaultdict
 from copy import deepcopy
+from collections import deque
 
 class Grammar(object):
 
@@ -70,8 +71,11 @@ class Lr0Parser(object):
         self.starting_symbol = grammar.starting_symbol
         self.augmented_grammar = None
         self.dotted_productions = None
-        self.user_friendly_productions()
+        self.indexable_productions()
         self.start_magic()
+        with open("out.txt", "w") as f:
+            f.write(str(self.grammar))
+            f.write("\n")
 
     def start_magic(self):
         self.augment_grammar()
@@ -90,11 +94,11 @@ class Lr0Parser(object):
                     .append(". "
                             + production.replace('\"', ""))  # eliminating double quotations
 
-    def user_friendly_productions(self):
-        self.uf_productions = []
+    def indexable_productions(self):
+        self.indexable_productions = []
         for x in self.productions:
             for productions in self.productions[x]:
-                self.uf_productions.append([x] + [lmbd.strip("\"") for lmbd in productions.split(" ")])
+                self.indexable_productions.append([x] + [lmbd.strip("\"") for lmbd in productions.split(" ")])
 
     def closure(self, element, closure_history, transition_history):
         #element = element[0]
@@ -116,6 +120,7 @@ class Lr0Parser(object):
             else:
                 closure_history[non_terminal] += transition_history[non_terminal]
             for transition in transition_history[non_terminal]:
+                #if non_terminal not in closure_history.keys():
                 self.closure(transition, closure_history, transition_history)
 
     def shift_dot(self, transition_ref):
@@ -152,46 +157,60 @@ class Lr0Parser(object):
         #     before_dot = shifted_transition[:space_before_dot]
         # else:
         #     before_dot = shifted_transition[:shifted_transition.index(".")-1]
-        # parent_key = before_dot
+        # parent_transition = before_dot
         dot_index = shifted_transition.index(".")
         space_before_dot = shifted_transition.rfind(" ", 0, dot_index-1)
         if -1 != space_before_dot:
             element_before_dot = shifted_transition[space_before_dot+1:dot_index-1]
         else:
             element_before_dot = shifted_transition[:dot_index-1]
-        parent_key = element_before_dot
+        parent_transition = element_before_dot
 
         self.queue.append({
             "state": closure_history,
             "initial_dotted": initial_transition,
             "parent": parent,
-            "parent_key": parent_key
+            "parent_transition": parent_transition
         })
 
-    def goto_all(self, state, initial_dotted, parent=-1, parent_key="-1"):
+    def check_for_collision(self, value, where, new_value):
+        if value is not None:
+            raise Exception("Collision occured in the parsing table at: {}. Tried inserting {} over {}".format(where, new_value, value))
+
+    def goto_all(self, state, initial_dotted, parent=-1, parent_transition="-1"):
         if state not in self.states:
             self.states.append(state)
             index = len(self.states) - 1
             self.state_parents[index] = {
                 "parent_index": parent,
-                "before_dot": parent_key
+                "before_dot": parent_transition
             }
-            self.pretty_print(state, "state {}".format(index))
+            self.pretty_print_map(state, "state {}".format(index))
             for key in state:
                 for transition in state[key]:
                     if transition[-1] != '.':
                         self.goto(initial_dotted, key, transition, index)
         else:
             if parent in self.inner_table_values:
-                if parent_key in self.non_terminals:
-                    self.inner_table_values[parent][parent_key] = "{}".format(self.states.index(state))
-                else:
-                    self.inner_table_values[parent][parent_key] = "s{}".format(self.states.index(state))
+                if parent_transition in self.non_terminals:  # if in goto part of table
+                    try:
+                        self.check_for_collision(self.inner_table_values[parent][parent_transition],
+                                             [parent, parent_transition], "{}".format(self.states.index(state)))
+                    except KeyError:
+                        pass
+                    self.inner_table_values[parent][parent_transition] = "{}".format(self.states.index(state))
+                else:                                        # if in action part of table
+                    try:
+                        self.check_for_collision(self.inner_table_values[parent][parent_transition],
+                                             [parent, parent_transition], "s{}".format(self.states.index(state)))
+                    except KeyError:
+                        pass
+                    self.inner_table_values[parent][parent_transition] = "s{}".format(self.states.index(state))
             else:
-                if parent_key in self.non_terminals:
-                    self.inner_table_values[parent] = {parent_key: "{}".format(self.states.index(state))}
-                else:
-                    self.inner_table_values[parent] = {parent_key: "s{}".format(self.states.index(state))}
+                if parent_transition in self.non_terminals:  # if in goto part of table
+                    self.inner_table_values[parent] = {parent_transition: "{}".format(self.states.index(state))}
+                else:                                        # if in action part of table
+                    self.inner_table_values[parent] = {parent_transition: "s{}".format(self.states.index(state))}
 
     def get_reduced(self):
         self.reduced = {}
@@ -222,7 +241,7 @@ class Lr0Parser(object):
                     if x != '':
                         transClean.append(x)
 
-                reduce_index = self.uf_productions.index(transClean) + 1
+                reduce_index = self.indexable_productions.index(transClean) + 1
 #                reduce_index = self.productions[red_k[0]].index(trans) + 1
                 self.inner_table_values[k] = { terminal: "r{}".format(reduce_index) for terminal in self.terminals}
                 self.inner_table_values[k]["$"] = "r{}".format(reduce_index)
@@ -233,19 +252,115 @@ class Lr0Parser(object):
             parent = self.state_parents[key]
             if parent["parent_index"] in self.inner_table_values:
                 if parent["before_dot"] in self.non_terminals:
+                    try:
+                        self.check_for_collision(self.inner_table_values[parent["parent_index"]][parent["before_dot"]],
+                                             [parent["parent_index", parent["before_dot"]]], "{}".format(key))
+                    except KeyError:
+                        pass
                     self.inner_table_values[parent["parent_index"]][parent["before_dot"]] = "{}".format(key)
                 else:
+                    try:
+                        self.check_for_collision(self.inner_table_values[parent["parent_index"]][parent["before_dot"]],
+                                             [parent["parent_index", parent["before_dot"]]], "s{}".format(key))
+                    except KeyError:
+                        pass
                     self.inner_table_values[parent["parent_index"]][parent["before_dot"]] = "s{}".format(key)
             else:
                 if parent["before_dot"] in self.non_terminals:
                     self.inner_table_values[parent["parent_index"]] = {parent["before_dot"]: "{}".format(key)}
                 else:
                     self.inner_table_values[parent["parent_index"]] = {parent["before_dot"]: "s{}".format(key)}
-        table = {"I{}".format(index): self.inner_table_values[index] for index in range(len(self.states))}
-        self.pretty_print(table, "Table:")
 
-    def pretty_print(self, map, message=None, deepness=""):
-        if message is not None:
-            print(deepness + message)
+    def show_parsing_table(self):
+        table = {"I{}".format(index): self.inner_table_values[index] for index in range(len(self.states))}
+        with open("out.txt", "a") as file:
+            self.print_and_write_to_file(self.pretty_print_map(table, "Parsing table:"), file)
+
+    def print_and_write_to_file(self, string, file_handle):
+        print(string)
+        file_handle.write(string)
+        file_handle.write("\n")
+
+    def actual_parsing(self, word):
+
+        if type(word) != list:
+            raise Exception("Input sequence must be in list format")
+
+        stack_alpha = deque()  # state stack
+        stack_beta = deque()  # word stack
+        stack_phi = deque()  # actions stack
+        end = False
+
+        class alpha_item(object):
+            def __init__(self, value, number):
+                self.value = value
+                self.number = number
+            def is_dummy(self):
+                return self.value == -1
+            def __str__(self):
+                return "{}{}".format(self.number,self.value) if self.number!=-1 else "{}".format(self.value)
+
+        stack_beta.append("$")
+        for letter in reversed(word):
+            stack_beta.append(letter)
+
+        stack_alpha.append(alpha_item(0, -1))
+
+        with open("out.txt", "a") as file:
+            self.print_and_write_to_file("Parsing sequence: {}\n".format("".join([x for x in word])), file)
+            self.print_and_write_to_file("Alpha | Beta | Phi", file)
+            self.print_and_write_to_file("~"*20, file)
+            while(end != True):
+                self.print_and_write_to_file("{} | {} | {}".format("".join([str(x) for x in stack_alpha]),
+                                        "".join([x for x in reversed(stack_beta)]),
+                                        "-" if len(stack_phi)==0 else stack_phi[-1]),
+                                             file)
+                current_step = stack_beta[-1]
+                current_state = stack_alpha[-1]
+
+                if "s" in self.inner_table_values[current_state.value][current_step]:
+                    current_step = stack_beta.pop()
+                    corresponding_state = int(self.inner_table_values[current_state.value][current_step][1:])
+                    stack_alpha.append(alpha_item(int(corresponding_state), current_step))
+                    stack_phi.append("Shift {}".format(corresponding_state))
+
+                elif "r" in self.inner_table_values[current_state.value][current_step]:
+                    corresponding_production_index = int(self.inner_table_values[current_state.value][current_step][1:])-1
+                    lhs = self.indexable_productions[corresponding_production_index][0]
+                    rhs = self.indexable_productions[corresponding_production_index][1:]
+                    for value in rhs:
+                        top_of_stack = stack_alpha.pop().number
+                        if top_of_stack not in rhs:
+                            raise Exception("Reduce failed")
+                        rhs = rhs[rhs.index(top_of_stack)+1:] + rhs[:rhs.index(top_of_stack)]
+
+                    top_alpha = stack_alpha[-1]
+                    stack_alpha.append(alpha_item(int(self.inner_table_values[top_alpha.value][lhs]), lhs))
+
+                    stack_phi.append("Reduced by {}->{}".format(self.indexable_productions[corresponding_production_index][0],
+                                                                "".join(self.indexable_productions[corresponding_production_index][1:])))
+
+                else:
+                    if 'accept' in self.inner_table_values[current_state.value][current_step]:
+                        self.print_and_write_to_file("{} | {} | {}".format("".join([str(x) for x in stack_alpha]),
+                                                    "".join([x for x in reversed(stack_beta)]),
+                                                    "Accept"),
+                                                     file)
+                        self.print_and_write_to_file("Success", file)
+                    else:
+                        self.print_and_write_to_file("{} | {} | {}".format("".join([str(x) for x in stack_alpha]),
+                                                    "".join([x for x in reversed(stack_beta)]),
+                                                    "Error"),
+                                                     file)
+                        self.print_and_write_to_file("Error",
+                                                     file)
+                    end = True
+
+
+    def pretty_print_map(self, map, message=None):
+        the_string = ""
+        if message:
+            the_string += message + "\n"
         for key in map:
-            print(f"{deepness}{key} : {map[key]}")
+            the_string += "{} : {}".format(key, map[key]) + "\n"
+        return the_string
