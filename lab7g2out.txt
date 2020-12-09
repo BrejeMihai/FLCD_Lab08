@@ -1,0 +1,157 @@
+The grammar is:
+Set of terminals= startmagic endmagic + - = * ^ / lt lte equals ne gte gt ( ) [ ] { } input echo gountil do incase then ~ int char string listof ! 0 1 
+Set of non terminals= program stmtList stmt cmpStmt ioStmt assignStmt simpleStmt whileStmt ifStmt structStmt factor term term1 expr expr1 cond typel arraydecl type decl decllist 
+The productions:
+program-> "startmagic cmpStmt endmagic"
+factor-> "( expr )" | "1" | "0"
+term-> "factor term1"
+term1-> "+ term term1" | "- term term1" | "/ term term1" | "* term term1"
+expr-> "term + term expr1" | "term - term expr1" | "term / term expr1"
+expr1-> "+ term expr1" | "- term expr1" | "/ term expr1" | "* term expr1"
+cond-> "expr lt expr" | "expr lte expr" | "expr equals expr" | "expr ne expr" | "expr gt expr"
+ioStmt-> "input 0" | "echo 0"
+assignStmt-> "0 = expr"
+simpleStmt-> "assignStmt" | "ioStmt"
+cmpStmt-> "( stmt )"
+whileStmt-> "gountil cond do cmpStmt"
+ifStmt-> "incase ( cond ) then cmpStmt"
+structStmt-> "cmpStmt" | "ifStmt" | "whileStmt"
+stmt-> "simpleStmt ~" | "structStmt ~" | "decllist"
+typel-> "int" | "char" | "string"
+arraydecl-> "listof typel"
+type-> "typel" | "arraydecl"
+decl-> "type ! 0 ~" | "eps"
+decllist-> "decl decllist" | "decl"
+
+Parsing table:
+I0 : {'program': '1', 'startmagic': 's2'}
+I1 : {'$': 'accept'}
+I2 : {'cmpStmt': '3', '(': 's4'}
+I3 : {'endmagic': 's5'}
+I4 : {'(': 's4', 'stmt': '6', 'simpleStmt': '7', 'structStmt': '8', 'decllist': '9', 'assignStmt': '10', 'ioStmt': '11', '0': 's12', 'input': 's13', 'echo': 's14', 'cmpStmt': '15', 'ifStmt': '16', 'whileStmt': '17', 'incase': 's18', 'gountil': 's19', 'decl': '21', 'type': '22', 'eps': 's23', 'typel': '24', 'arraydecl': '25', 'int': 's26', 'char': 's27', 'string': 's28', 'listof': 's29'}
+I5 : {'startmagic': 'r1', 'endmagic': 'r1', '+': 'r1', '-': 'r1', '=': 'r1', '*': 'r1', '^': 'r1', '/': 'r1', 'lt': 'r1', 'lte': 'r1', 'equals': 'r1', 'ne': 'r1', 'gte': 'r1', 'gt': 'r1', '(': 'r1', ')': 'r1', '[': 'r1', ']': 'r1', '{': 'r1', '}': 'r1', 'input': 'r1', 'echo': 'r1', 'gountil': 'r1', 'do': 'r1', 'incase': 'r1', 'then': 'r1', '~': 'r1', 'int': 'r1', 'char': 'r1', 'string': 'r1', 'listof': 'r1', '!': 'r1', '0': 'r1', '1': 'r1', '$': 'r1'}
+I6 : {')': 's30'}
+I7 : {'~': 's31'}
+I8 : {'~': 's32'}
+I9 : {'startmagic': 'r35', 'endmagic': 'r35', '+': 'r35', '-': 'r35', '=': 'r35', '*': 'r35', '^': 'r35', '/': 'r35', 'lt': 'r35', 'lte': 'r35', 'equals': 'r35', 'ne': 'r35', 'gte': 'r35', 'gt': 'r35', '(': 'r35', ')': 'r35', '[': 'r35', ']': 'r35', '{': 'r35', '}': 'r35', 'input': 'r35', 'echo': 'r35', 'gountil': 'r35', 'do': 'r35', 'incase': 'r35', 'then': 'r35', '~': 'r35', 'int': 'r35', 'char': 'r35', 'string': 'r35', 'listof': 'r35', '!': 'r35', '0': 'r35', '1': 'r35', '$': 'r35'}
+I10 : {'startmagic': 'r25', 'endmagic': 'r25', '+': 'r25', '-': 'r25', '=': 'r25', '*': 'r25', '^': 'r25', '/': 'r25', 'lt': 'r25', 'lte': 'r25', 'equals': 'r25', 'ne': 'r25', 'gte': 'r25', 'gt': 'r25', '(': 'r25', ')': 'r25', '[': 'r25', ']': 'r25', '{': 'r25', '}': 'r25', 'input': 'r25', 'echo': 'r25', 'gountil': 'r25', 'do': 'r25', 'incase': 'r25', 'then': 'r25', '~': 'r25', 'int': 'r25', 'char': 'r25', 'string': 'r25', 'listof': 'r25', '!': 'r25', '0': 'r25', '1': 'r25', '$': 'r25'}
+I11 : {'startmagic': 'r26', 'endmagic': 'r26', '+': 'r26', '-': 'r26', '=': 'r26', '*': 'r26', '^': 'r26', '/': 'r26', 'lt': 'r26', 'lte': 'r26', 'equals': 'r26', 'ne': 'r26', 'gte': 'r26', 'gt': 'r26', '(': 'r26', ')': 'r26', '[': 'r26', ']': 'r26', '{': 'r26', '}': 'r26', 'input': 'r26', 'echo': 'r26', 'gountil': 'r26', 'do': 'r26', 'incase': 'r26', 'then': 'r26', '~': 'r26', 'int': 'r26', 'char': 'r26', 'string': 'r26', 'listof': 'r26', '!': 'r26', '0': 'r26', '1': 'r26', '$': 'r26'}
+I12 : {'=': 's33'}
+I13 : {'0': 's34'}
+I14 : {'0': 's35'}
+I15 : {'startmagic': 'r30', 'endmagic': 'r30', '+': 'r30', '-': 'r30', '=': 'r30', '*': 'r30', '^': 'r30', '/': 'r30', 'lt': 'r30', 'lte': 'r30', 'equals': 'r30', 'ne': 'r30', 'gte': 'r30', 'gt': 'r30', '(': 'r30', ')': 'r30', '[': 'r30', ']': 'r30', '{': 'r30', '}': 'r30', 'input': 'r30', 'echo': 'r30', 'gountil': 'r30', 'do': 'r30', 'incase': 'r30', 'then': 'r30', '~': 'r30', 'int': 'r30', 'char': 'r30', 'string': 'r30', 'listof': 'r30', '!': 'r30', '0': 'r30', '1': 'r30', '$': 'r30'}
+I16 : {'startmagic': 'r31', 'endmagic': 'r31', '+': 'r31', '-': 'r31', '=': 'r31', '*': 'r31', '^': 'r31', '/': 'r31', 'lt': 'r31', 'lte': 'r31', 'equals': 'r31', 'ne': 'r31', 'gte': 'r31', 'gt': 'r31', '(': 'r31', ')': 'r31', '[': 'r31', ']': 'r31', '{': 'r31', '}': 'r31', 'input': 'r31', 'echo': 'r31', 'gountil': 'r31', 'do': 'r31', 'incase': 'r31', 'then': 'r31', '~': 'r31', 'int': 'r31', 'char': 'r31', 'string': 'r31', 'listof': 'r31', '!': 'r31', '0': 'r31', '1': 'r31', '$': 'r31'}
+I17 : {'startmagic': 'r32', 'endmagic': 'r32', '+': 'r32', '-': 'r32', '=': 'r32', '*': 'r32', '^': 'r32', '/': 'r32', 'lt': 'r32', 'lte': 'r32', 'equals': 'r32', 'ne': 'r32', 'gte': 'r32', 'gt': 'r32', '(': 'r32', ')': 'r32', '[': 'r32', ']': 'r32', '{': 'r32', '}': 'r32', 'input': 'r32', 'echo': 'r32', 'gountil': 'r32', 'do': 'r32', 'incase': 'r32', 'then': 'r32', '~': 'r32', 'int': 'r32', 'char': 'r32', 'string': 'r32', 'listof': 'r32', '!': 'r32', '0': 'r32', '1': 'r32', '$': 'r32'}
+I18 : {'(': 's36'}
+I19 : {'cond': '37', 'expr': '42', 'term': '45', 'factor': '46', '(': 's47', '1': 's48', '0': 's49'}
+I20 : {'decl': '21', 'type': '22', 'eps': 's23', 'typel': '24', 'arraydecl': '25', 'int': 's26', 'char': 's27', 'string': 's28', 'listof': 's29', 'decllist': '50'}
+I21 : {'startmagic': 'r45', 'endmagic': 'r45', '+': 'r45', '-': 'r45', '=': 'r45', '*': 'r45', '^': 'r45', '/': 'r45', 'lt': 'r45', 'lte': 'r45', 'equals': 'r45', 'ne': 'r45', 'gte': 'r45', 'gt': 'r45', '(': 'r45', ')': 'r45', '[': 'r45', ']': 'r45', '{': 'r45', '}': 'r45', 'input': 'r45', 'echo': 'r45', 'gountil': 'r45', 'do': 'r45', 'incase': 'r45', 'then': 'r45', '~': 'r45', 'int': 'r45', 'char': 'r45', 'string': 'r45', 'listof': 'r45', '!': 'r45', '0': 'r45', '1': 'r45', '$': 'r45'}
+I22 : {'!': 's51'}
+I23 : {'startmagic': 'r43', 'endmagic': 'r43', '+': 'r43', '-': 'r43', '=': 'r43', '*': 'r43', '^': 'r43', '/': 'r43', 'lt': 'r43', 'lte': 'r43', 'equals': 'r43', 'ne': 'r43', 'gte': 'r43', 'gt': 'r43', '(': 'r43', ')': 'r43', '[': 'r43', ']': 'r43', '{': 'r43', '}': 'r43', 'input': 'r43', 'echo': 'r43', 'gountil': 'r43', 'do': 'r43', 'incase': 'r43', 'then': 'r43', '~': 'r43', 'int': 'r43', 'char': 'r43', 'string': 'r43', 'listof': 'r43', '!': 'r43', '0': 'r43', '1': 'r43', '$': 'r43'}
+I24 : {'startmagic': 'r40', 'endmagic': 'r40', '+': 'r40', '-': 'r40', '=': 'r40', '*': 'r40', '^': 'r40', '/': 'r40', 'lt': 'r40', 'lte': 'r40', 'equals': 'r40', 'ne': 'r40', 'gte': 'r40', 'gt': 'r40', '(': 'r40', ')': 'r40', '[': 'r40', ']': 'r40', '{': 'r40', '}': 'r40', 'input': 'r40', 'echo': 'r40', 'gountil': 'r40', 'do': 'r40', 'incase': 'r40', 'then': 'r40', '~': 'r40', 'int': 'r40', 'char': 'r40', 'string': 'r40', 'listof': 'r40', '!': 'r40', '0': 'r40', '1': 'r40', '$': 'r40'}
+I25 : {'startmagic': 'r41', 'endmagic': 'r41', '+': 'r41', '-': 'r41', '=': 'r41', '*': 'r41', '^': 'r41', '/': 'r41', 'lt': 'r41', 'lte': 'r41', 'equals': 'r41', 'ne': 'r41', 'gte': 'r41', 'gt': 'r41', '(': 'r41', ')': 'r41', '[': 'r41', ']': 'r41', '{': 'r41', '}': 'r41', 'input': 'r41', 'echo': 'r41', 'gountil': 'r41', 'do': 'r41', 'incase': 'r41', 'then': 'r41', '~': 'r41', 'int': 'r41', 'char': 'r41', 'string': 'r41', 'listof': 'r41', '!': 'r41', '0': 'r41', '1': 'r41', '$': 'r41'}
+I26 : {'startmagic': 'r36', 'endmagic': 'r36', '+': 'r36', '-': 'r36', '=': 'r36', '*': 'r36', '^': 'r36', '/': 'r36', 'lt': 'r36', 'lte': 'r36', 'equals': 'r36', 'ne': 'r36', 'gte': 'r36', 'gt': 'r36', '(': 'r36', ')': 'r36', '[': 'r36', ']': 'r36', '{': 'r36', '}': 'r36', 'input': 'r36', 'echo': 'r36', 'gountil': 'r36', 'do': 'r36', 'incase': 'r36', 'then': 'r36', '~': 'r36', 'int': 'r36', 'char': 'r36', 'string': 'r36', 'listof': 'r36', '!': 'r36', '0': 'r36', '1': 'r36', '$': 'r36'}
+I27 : {'startmagic': 'r37', 'endmagic': 'r37', '+': 'r37', '-': 'r37', '=': 'r37', '*': 'r37', '^': 'r37', '/': 'r37', 'lt': 'r37', 'lte': 'r37', 'equals': 'r37', 'ne': 'r37', 'gte': 'r37', 'gt': 'r37', '(': 'r37', ')': 'r37', '[': 'r37', ']': 'r37', '{': 'r37', '}': 'r37', 'input': 'r37', 'echo': 'r37', 'gountil': 'r37', 'do': 'r37', 'incase': 'r37', 'then': 'r37', '~': 'r37', 'int': 'r37', 'char': 'r37', 'string': 'r37', 'listof': 'r37', '!': 'r37', '0': 'r37', '1': 'r37', '$': 'r37'}
+I28 : {'startmagic': 'r38', 'endmagic': 'r38', '+': 'r38', '-': 'r38', '=': 'r38', '*': 'r38', '^': 'r38', '/': 'r38', 'lt': 'r38', 'lte': 'r38', 'equals': 'r38', 'ne': 'r38', 'gte': 'r38', 'gt': 'r38', '(': 'r38', ')': 'r38', '[': 'r38', ']': 'r38', '{': 'r38', '}': 'r38', 'input': 'r38', 'echo': 'r38', 'gountil': 'r38', 'do': 'r38', 'incase': 'r38', 'then': 'r38', '~': 'r38', 'int': 'r38', 'char': 'r38', 'string': 'r38', 'listof': 'r38', '!': 'r38', '0': 'r38', '1': 'r38', '$': 'r38'}
+I29 : {'int': 's26', 'char': 's27', 'string': 's28', 'typel': '52'}
+I30 : {'startmagic': 'r27', 'endmagic': 'r27', '+': 'r27', '-': 'r27', '=': 'r27', '*': 'r27', '^': 'r27', '/': 'r27', 'lt': 'r27', 'lte': 'r27', 'equals': 'r27', 'ne': 'r27', 'gte': 'r27', 'gt': 'r27', '(': 'r27', ')': 'r27', '[': 'r27', ']': 'r27', '{': 'r27', '}': 'r27', 'input': 'r27', 'echo': 'r27', 'gountil': 'r27', 'do': 'r27', 'incase': 'r27', 'then': 'r27', '~': 'r27', 'int': 'r27', 'char': 'r27', 'string': 'r27', 'listof': 'r27', '!': 'r27', '0': 'r27', '1': 'r27', '$': 'r27'}
+I31 : {'startmagic': 'r33', 'endmagic': 'r33', '+': 'r33', '-': 'r33', '=': 'r33', '*': 'r33', '^': 'r33', '/': 'r33', 'lt': 'r33', 'lte': 'r33', 'equals': 'r33', 'ne': 'r33', 'gte': 'r33', 'gt': 'r33', '(': 'r33', ')': 'r33', '[': 'r33', ']': 'r33', '{': 'r33', '}': 'r33', 'input': 'r33', 'echo': 'r33', 'gountil': 'r33', 'do': 'r33', 'incase': 'r33', 'then': 'r33', '~': 'r33', 'int': 'r33', 'char': 'r33', 'string': 'r33', 'listof': 'r33', '!': 'r33', '0': 'r33', '1': 'r33', '$': 'r33'}
+I32 : {'startmagic': 'r34', 'endmagic': 'r34', '+': 'r34', '-': 'r34', '=': 'r34', '*': 'r34', '^': 'r34', '/': 'r34', 'lt': 'r34', 'lte': 'r34', 'equals': 'r34', 'ne': 'r34', 'gte': 'r34', 'gt': 'r34', '(': 'r34', ')': 'r34', '[': 'r34', ']': 'r34', '{': 'r34', '}': 'r34', 'input': 'r34', 'echo': 'r34', 'gountil': 'r34', 'do': 'r34', 'incase': 'r34', 'then': 'r34', '~': 'r34', 'int': 'r34', 'char': 'r34', 'string': 'r34', 'listof': 'r34', '!': 'r34', '0': 'r34', '1': 'r34', '$': 'r34'}
+I33 : {'term': '45', 'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'expr': '53'}
+I34 : {'startmagic': 'r22', 'endmagic': 'r22', '+': 'r22', '-': 'r22', '=': 'r22', '*': 'r22', '^': 'r22', '/': 'r22', 'lt': 'r22', 'lte': 'r22', 'equals': 'r22', 'ne': 'r22', 'gte': 'r22', 'gt': 'r22', '(': 'r22', ')': 'r22', '[': 'r22', ']': 'r22', '{': 'r22', '}': 'r22', 'input': 'r22', 'echo': 'r22', 'gountil': 'r22', 'do': 'r22', 'incase': 'r22', 'then': 'r22', '~': 'r22', 'int': 'r22', 'char': 'r22', 'string': 'r22', 'listof': 'r22', '!': 'r22', '0': 'r22', '1': 'r22', '$': 'r22'}
+I35 : {'startmagic': 'r23', 'endmagic': 'r23', '+': 'r23', '-': 'r23', '=': 'r23', '*': 'r23', '^': 'r23', '/': 'r23', 'lt': 'r23', 'lte': 'r23', 'equals': 'r23', 'ne': 'r23', 'gte': 'r23', 'gt': 'r23', '(': 'r23', ')': 'r23', '[': 'r23', ']': 'r23', '{': 'r23', '}': 'r23', 'input': 'r23', 'echo': 'r23', 'gountil': 'r23', 'do': 'r23', 'incase': 'r23', 'then': 'r23', '~': 'r23', 'int': 'r23', 'char': 'r23', 'string': 'r23', 'listof': 'r23', '!': 'r23', '0': 'r23', '1': 'r23', '$': 'r23'}
+I36 : {'expr': '42', 'term': '45', 'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'cond': '54'}
+I37 : {'do': 's55'}
+I38 : {'lt': 's56'}
+I39 : {'lte': 's57'}
+I40 : {'equals': 's58'}
+I41 : {'ne': 's59'}
+I42 : {'gt': 's60'}
+I43 : {'+': 's61'}
+I44 : {'-': 's62'}
+I45 : {'/': 's63'}
+I46 : {'term1': '64', '+': 's65', '-': 's66', '/': 's67', '*': 's68'}
+I47 : {'(': 's47', '1': 's48', '0': 's49', 'term': '45', 'factor': '46', 'expr': '69'}
+I48 : {'startmagic': 'r3', 'endmagic': 'r3', '+': 'r3', '-': 'r3', '=': 'r3', '*': 'r3', '^': 'r3', '/': 'r3', 'lt': 'r3', 'lte': 'r3', 'equals': 'r3', 'ne': 'r3', 'gte': 'r3', 'gt': 'r3', '(': 'r3', ')': 'r3', '[': 'r3', ']': 'r3', '{': 'r3', '}': 'r3', 'input': 'r3', 'echo': 'r3', 'gountil': 'r3', 'do': 'r3', 'incase': 'r3', 'then': 'r3', '~': 'r3', 'int': 'r3', 'char': 'r3', 'string': 'r3', 'listof': 'r3', '!': 'r3', '0': 'r3', '1': 'r3', '$': 'r3'}
+I49 : {'startmagic': 'r4', 'endmagic': 'r4', '+': 'r4', '-': 'r4', '=': 'r4', '*': 'r4', '^': 'r4', '/': 'r4', 'lt': 'r4', 'lte': 'r4', 'equals': 'r4', 'ne': 'r4', 'gte': 'r4', 'gt': 'r4', '(': 'r4', ')': 'r4', '[': 'r4', ']': 'r4', '{': 'r4', '}': 'r4', 'input': 'r4', 'echo': 'r4', 'gountil': 'r4', 'do': 'r4', 'incase': 'r4', 'then': 'r4', '~': 'r4', 'int': 'r4', 'char': 'r4', 'string': 'r4', 'listof': 'r4', '!': 'r4', '0': 'r4', '1': 'r4', '$': 'r4'}
+I50 : {'startmagic': 'r44', 'endmagic': 'r44', '+': 'r44', '-': 'r44', '=': 'r44', '*': 'r44', '^': 'r44', '/': 'r44', 'lt': 'r44', 'lte': 'r44', 'equals': 'r44', 'ne': 'r44', 'gte': 'r44', 'gt': 'r44', '(': 'r44', ')': 'r44', '[': 'r44', ']': 'r44', '{': 'r44', '}': 'r44', 'input': 'r44', 'echo': 'r44', 'gountil': 'r44', 'do': 'r44', 'incase': 'r44', 'then': 'r44', '~': 'r44', 'int': 'r44', 'char': 'r44', 'string': 'r44', 'listof': 'r44', '!': 'r44', '0': 'r44', '1': 'r44', '$': 'r44'}
+I51 : {'0': 's70'}
+I52 : {'startmagic': 'r39', 'endmagic': 'r39', '+': 'r39', '-': 'r39', '=': 'r39', '*': 'r39', '^': 'r39', '/': 'r39', 'lt': 'r39', 'lte': 'r39', 'equals': 'r39', 'ne': 'r39', 'gte': 'r39', 'gt': 'r39', '(': 'r39', ')': 'r39', '[': 'r39', ']': 'r39', '{': 'r39', '}': 'r39', 'input': 'r39', 'echo': 'r39', 'gountil': 'r39', 'do': 'r39', 'incase': 'r39', 'then': 'r39', '~': 'r39', 'int': 'r39', 'char': 'r39', 'string': 'r39', 'listof': 'r39', '!': 'r39', '0': 'r39', '1': 'r39', '$': 'r39'}
+I53 : {'startmagic': 'r24', 'endmagic': 'r24', '+': 'r24', '-': 'r24', '=': 'r24', '*': 'r24', '^': 'r24', '/': 'r24', 'lt': 'r24', 'lte': 'r24', 'equals': 'r24', 'ne': 'r24', 'gte': 'r24', 'gt': 'r24', '(': 'r24', ')': 'r24', '[': 'r24', ']': 'r24', '{': 'r24', '}': 'r24', 'input': 'r24', 'echo': 'r24', 'gountil': 'r24', 'do': 'r24', 'incase': 'r24', 'then': 'r24', '~': 'r24', 'int': 'r24', 'char': 'r24', 'string': 'r24', 'listof': 'r24', '!': 'r24', '0': 'r24', '1': 'r24', '$': 'r24'}
+I54 : {')': 's71'}
+I55 : {'(': 's4', 'cmpStmt': '72'}
+I56 : {'term': '45', 'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'expr': '73'}
+I57 : {'term': '45', 'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'expr': '74'}
+I58 : {'term': '45', 'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'expr': '75'}
+I59 : {'term': '45', 'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'expr': '76'}
+I60 : {'term': '45', 'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'expr': '77'}
+I61 : {'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'term': '78'}
+I62 : {'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'term': '79'}
+I63 : {'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'term': '80'}
+I64 : {'startmagic': 'r5', 'endmagic': 'r5', '+': 'r5', '-': 'r5', '=': 'r5', '*': 'r5', '^': 'r5', '/': 'r5', 'lt': 'r5', 'lte': 'r5', 'equals': 'r5', 'ne': 'r5', 'gte': 'r5', 'gt': 'r5', '(': 'r5', ')': 'r5', '[': 'r5', ']': 'r5', '{': 'r5', '}': 'r5', 'input': 'r5', 'echo': 'r5', 'gountil': 'r5', 'do': 'r5', 'incase': 'r5', 'then': 'r5', '~': 'r5', 'int': 'r5', 'char': 'r5', 'string': 'r5', 'listof': 'r5', '!': 'r5', '0': 'r5', '1': 'r5', '$': 'r5'}
+I65 : {'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'term': '81'}
+I66 : {'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'term': '82'}
+I67 : {'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'term': '83'}
+I68 : {'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'term': '84'}
+I69 : {')': 's85'}
+I70 : {'~': 's86'}
+I71 : {'then': 's87'}
+I72 : {'startmagic': 'r28', 'endmagic': 'r28', '+': 'r28', '-': 'r28', '=': 'r28', '*': 'r28', '^': 'r28', '/': 'r28', 'lt': 'r28', 'lte': 'r28', 'equals': 'r28', 'ne': 'r28', 'gte': 'r28', 'gt': 'r28', '(': 'r28', ')': 'r28', '[': 'r28', ']': 'r28', '{': 'r28', '}': 'r28', 'input': 'r28', 'echo': 'r28', 'gountil': 'r28', 'do': 'r28', 'incase': 'r28', 'then': 'r28', '~': 'r28', 'int': 'r28', 'char': 'r28', 'string': 'r28', 'listof': 'r28', '!': 'r28', '0': 'r28', '1': 'r28', '$': 'r28'}
+I73 : {'startmagic': 'r17', 'endmagic': 'r17', '+': 'r17', '-': 'r17', '=': 'r17', '*': 'r17', '^': 'r17', '/': 'r17', 'lt': 'r17', 'lte': 'r17', 'equals': 'r17', 'ne': 'r17', 'gte': 'r17', 'gt': 'r17', '(': 'r17', ')': 'r17', '[': 'r17', ']': 'r17', '{': 'r17', '}': 'r17', 'input': 'r17', 'echo': 'r17', 'gountil': 'r17', 'do': 'r17', 'incase': 'r17', 'then': 'r17', '~': 'r17', 'int': 'r17', 'char': 'r17', 'string': 'r17', 'listof': 'r17', '!': 'r17', '0': 'r17', '1': 'r17', '$': 'r17'}
+I74 : {'startmagic': 'r18', 'endmagic': 'r18', '+': 'r18', '-': 'r18', '=': 'r18', '*': 'r18', '^': 'r18', '/': 'r18', 'lt': 'r18', 'lte': 'r18', 'equals': 'r18', 'ne': 'r18', 'gte': 'r18', 'gt': 'r18', '(': 'r18', ')': 'r18', '[': 'r18', ']': 'r18', '{': 'r18', '}': 'r18', 'input': 'r18', 'echo': 'r18', 'gountil': 'r18', 'do': 'r18', 'incase': 'r18', 'then': 'r18', '~': 'r18', 'int': 'r18', 'char': 'r18', 'string': 'r18', 'listof': 'r18', '!': 'r18', '0': 'r18', '1': 'r18', '$': 'r18'}
+I75 : {'startmagic': 'r19', 'endmagic': 'r19', '+': 'r19', '-': 'r19', '=': 'r19', '*': 'r19', '^': 'r19', '/': 'r19', 'lt': 'r19', 'lte': 'r19', 'equals': 'r19', 'ne': 'r19', 'gte': 'r19', 'gt': 'r19', '(': 'r19', ')': 'r19', '[': 'r19', ']': 'r19', '{': 'r19', '}': 'r19', 'input': 'r19', 'echo': 'r19', 'gountil': 'r19', 'do': 'r19', 'incase': 'r19', 'then': 'r19', '~': 'r19', 'int': 'r19', 'char': 'r19', 'string': 'r19', 'listof': 'r19', '!': 'r19', '0': 'r19', '1': 'r19', '$': 'r19'}
+I76 : {'startmagic': 'r20', 'endmagic': 'r20', '+': 'r20', '-': 'r20', '=': 'r20', '*': 'r20', '^': 'r20', '/': 'r20', 'lt': 'r20', 'lte': 'r20', 'equals': 'r20', 'ne': 'r20', 'gte': 'r20', 'gt': 'r20', '(': 'r20', ')': 'r20', '[': 'r20', ']': 'r20', '{': 'r20', '}': 'r20', 'input': 'r20', 'echo': 'r20', 'gountil': 'r20', 'do': 'r20', 'incase': 'r20', 'then': 'r20', '~': 'r20', 'int': 'r20', 'char': 'r20', 'string': 'r20', 'listof': 'r20', '!': 'r20', '0': 'r20', '1': 'r20', '$': 'r20'}
+I77 : {'startmagic': 'r21', 'endmagic': 'r21', '+': 'r21', '-': 'r21', '=': 'r21', '*': 'r21', '^': 'r21', '/': 'r21', 'lt': 'r21', 'lte': 'r21', 'equals': 'r21', 'ne': 'r21', 'gte': 'r21', 'gt': 'r21', '(': 'r21', ')': 'r21', '[': 'r21', ']': 'r21', '{': 'r21', '}': 'r21', 'input': 'r21', 'echo': 'r21', 'gountil': 'r21', 'do': 'r21', 'incase': 'r21', 'then': 'r21', '~': 'r21', 'int': 'r21', 'char': 'r21', 'string': 'r21', 'listof': 'r21', '!': 'r21', '0': 'r21', '1': 'r21', '$': 'r21'}
+I78 : {'expr1': '88', '+': 's89', '-': 's90', '/': 's91', '*': 's92'}
+I79 : {'+': 's89', '-': 's90', '/': 's91', '*': 's92', 'expr1': '93'}
+I80 : {'+': 's89', '-': 's90', '/': 's91', '*': 's92', 'expr1': '94'}
+I81 : {'+': 's65', '-': 's66', '/': 's67', '*': 's68', 'term1': '95'}
+I82 : {'+': 's65', '-': 's66', '/': 's67', '*': 's68', 'term1': '96'}
+I83 : {'+': 's65', '-': 's66', '/': 's67', '*': 's68', 'term1': '97'}
+I84 : {'+': 's65', '-': 's66', '/': 's67', '*': 's68', 'term1': '98'}
+I85 : {'startmagic': 'r2', 'endmagic': 'r2', '+': 'r2', '-': 'r2', '=': 'r2', '*': 'r2', '^': 'r2', '/': 'r2', 'lt': 'r2', 'lte': 'r2', 'equals': 'r2', 'ne': 'r2', 'gte': 'r2', 'gt': 'r2', '(': 'r2', ')': 'r2', '[': 'r2', ']': 'r2', '{': 'r2', '}': 'r2', 'input': 'r2', 'echo': 'r2', 'gountil': 'r2', 'do': 'r2', 'incase': 'r2', 'then': 'r2', '~': 'r2', 'int': 'r2', 'char': 'r2', 'string': 'r2', 'listof': 'r2', '!': 'r2', '0': 'r2', '1': 'r2', '$': 'r2'}
+I86 : {'startmagic': 'r42', 'endmagic': 'r42', '+': 'r42', '-': 'r42', '=': 'r42', '*': 'r42', '^': 'r42', '/': 'r42', 'lt': 'r42', 'lte': 'r42', 'equals': 'r42', 'ne': 'r42', 'gte': 'r42', 'gt': 'r42', '(': 'r42', ')': 'r42', '[': 'r42', ']': 'r42', '{': 'r42', '}': 'r42', 'input': 'r42', 'echo': 'r42', 'gountil': 'r42', 'do': 'r42', 'incase': 'r42', 'then': 'r42', '~': 'r42', 'int': 'r42', 'char': 'r42', 'string': 'r42', 'listof': 'r42', '!': 'r42', '0': 'r42', '1': 'r42', '$': 'r42'}
+I87 : {'(': 's4', 'cmpStmt': '99'}
+I88 : {'startmagic': 'r10', 'endmagic': 'r10', '+': 'r10', '-': 'r10', '=': 'r10', '*': 'r10', '^': 'r10', '/': 'r10', 'lt': 'r10', 'lte': 'r10', 'equals': 'r10', 'ne': 'r10', 'gte': 'r10', 'gt': 'r10', '(': 'r10', ')': 'r10', '[': 'r10', ']': 'r10', '{': 'r10', '}': 'r10', 'input': 'r10', 'echo': 'r10', 'gountil': 'r10', 'do': 'r10', 'incase': 'r10', 'then': 'r10', '~': 'r10', 'int': 'r10', 'char': 'r10', 'string': 'r10', 'listof': 'r10', '!': 'r10', '0': 'r10', '1': 'r10', '$': 'r10'}
+I89 : {'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'term': '100'}
+I90 : {'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'term': '101'}
+I91 : {'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'term': '102'}
+I92 : {'factor': '46', '(': 's47', '1': 's48', '0': 's49', 'term': '103'}
+I93 : {'startmagic': 'r11', 'endmagic': 'r11', '+': 'r11', '-': 'r11', '=': 'r11', '*': 'r11', '^': 'r11', '/': 'r11', 'lt': 'r11', 'lte': 'r11', 'equals': 'r11', 'ne': 'r11', 'gte': 'r11', 'gt': 'r11', '(': 'r11', ')': 'r11', '[': 'r11', ']': 'r11', '{': 'r11', '}': 'r11', 'input': 'r11', 'echo': 'r11', 'gountil': 'r11', 'do': 'r11', 'incase': 'r11', 'then': 'r11', '~': 'r11', 'int': 'r11', 'char': 'r11', 'string': 'r11', 'listof': 'r11', '!': 'r11', '0': 'r11', '1': 'r11', '$': 'r11'}
+I94 : {'startmagic': 'r12', 'endmagic': 'r12', '+': 'r12', '-': 'r12', '=': 'r12', '*': 'r12', '^': 'r12', '/': 'r12', 'lt': 'r12', 'lte': 'r12', 'equals': 'r12', 'ne': 'r12', 'gte': 'r12', 'gt': 'r12', '(': 'r12', ')': 'r12', '[': 'r12', ']': 'r12', '{': 'r12', '}': 'r12', 'input': 'r12', 'echo': 'r12', 'gountil': 'r12', 'do': 'r12', 'incase': 'r12', 'then': 'r12', '~': 'r12', 'int': 'r12', 'char': 'r12', 'string': 'r12', 'listof': 'r12', '!': 'r12', '0': 'r12', '1': 'r12', '$': 'r12'}
+I95 : {'startmagic': 'r6', 'endmagic': 'r6', '+': 'r6', '-': 'r6', '=': 'r6', '*': 'r6', '^': 'r6', '/': 'r6', 'lt': 'r6', 'lte': 'r6', 'equals': 'r6', 'ne': 'r6', 'gte': 'r6', 'gt': 'r6', '(': 'r6', ')': 'r6', '[': 'r6', ']': 'r6', '{': 'r6', '}': 'r6', 'input': 'r6', 'echo': 'r6', 'gountil': 'r6', 'do': 'r6', 'incase': 'r6', 'then': 'r6', '~': 'r6', 'int': 'r6', 'char': 'r6', 'string': 'r6', 'listof': 'r6', '!': 'r6', '0': 'r6', '1': 'r6', '$': 'r6'}
+I96 : {'startmagic': 'r7', 'endmagic': 'r7', '+': 'r7', '-': 'r7', '=': 'r7', '*': 'r7', '^': 'r7', '/': 'r7', 'lt': 'r7', 'lte': 'r7', 'equals': 'r7', 'ne': 'r7', 'gte': 'r7', 'gt': 'r7', '(': 'r7', ')': 'r7', '[': 'r7', ']': 'r7', '{': 'r7', '}': 'r7', 'input': 'r7', 'echo': 'r7', 'gountil': 'r7', 'do': 'r7', 'incase': 'r7', 'then': 'r7', '~': 'r7', 'int': 'r7', 'char': 'r7', 'string': 'r7', 'listof': 'r7', '!': 'r7', '0': 'r7', '1': 'r7', '$': 'r7'}
+I97 : {'startmagic': 'r8', 'endmagic': 'r8', '+': 'r8', '-': 'r8', '=': 'r8', '*': 'r8', '^': 'r8', '/': 'r8', 'lt': 'r8', 'lte': 'r8', 'equals': 'r8', 'ne': 'r8', 'gte': 'r8', 'gt': 'r8', '(': 'r8', ')': 'r8', '[': 'r8', ']': 'r8', '{': 'r8', '}': 'r8', 'input': 'r8', 'echo': 'r8', 'gountil': 'r8', 'do': 'r8', 'incase': 'r8', 'then': 'r8', '~': 'r8', 'int': 'r8', 'char': 'r8', 'string': 'r8', 'listof': 'r8', '!': 'r8', '0': 'r8', '1': 'r8', '$': 'r8'}
+I98 : {'startmagic': 'r9', 'endmagic': 'r9', '+': 'r9', '-': 'r9', '=': 'r9', '*': 'r9', '^': 'r9', '/': 'r9', 'lt': 'r9', 'lte': 'r9', 'equals': 'r9', 'ne': 'r9', 'gte': 'r9', 'gt': 'r9', '(': 'r9', ')': 'r9', '[': 'r9', ']': 'r9', '{': 'r9', '}': 'r9', 'input': 'r9', 'echo': 'r9', 'gountil': 'r9', 'do': 'r9', 'incase': 'r9', 'then': 'r9', '~': 'r9', 'int': 'r9', 'char': 'r9', 'string': 'r9', 'listof': 'r9', '!': 'r9', '0': 'r9', '1': 'r9', '$': 'r9'}
+I99 : {'startmagic': 'r29', 'endmagic': 'r29', '+': 'r29', '-': 'r29', '=': 'r29', '*': 'r29', '^': 'r29', '/': 'r29', 'lt': 'r29', 'lte': 'r29', 'equals': 'r29', 'ne': 'r29', 'gte': 'r29', 'gt': 'r29', '(': 'r29', ')': 'r29', '[': 'r29', ']': 'r29', '{': 'r29', '}': 'r29', 'input': 'r29', 'echo': 'r29', 'gountil': 'r29', 'do': 'r29', 'incase': 'r29', 'then': 'r29', '~': 'r29', 'int': 'r29', 'char': 'r29', 'string': 'r29', 'listof': 'r29', '!': 'r29', '0': 'r29', '1': 'r29', '$': 'r29'}
+I100 : {'+': 's89', '-': 's90', '/': 's91', '*': 's92', 'expr1': '104'}
+I101 : {'+': 's89', '-': 's90', '/': 's91', '*': 's92', 'expr1': '105'}
+I102 : {'+': 's89', '-': 's90', '/': 's91', '*': 's92', 'expr1': '106'}
+I103 : {'+': 's89', '-': 's90', '/': 's91', '*': 's92', 'expr1': '107'}
+I104 : {'startmagic': 'r13', 'endmagic': 'r13', '+': 'r13', '-': 'r13', '=': 'r13', '*': 'r13', '^': 'r13', '/': 'r13', 'lt': 'r13', 'lte': 'r13', 'equals': 'r13', 'ne': 'r13', 'gte': 'r13', 'gt': 'r13', '(': 'r13', ')': 'r13', '[': 'r13', ']': 'r13', '{': 'r13', '}': 'r13', 'input': 'r13', 'echo': 'r13', 'gountil': 'r13', 'do': 'r13', 'incase': 'r13', 'then': 'r13', '~': 'r13', 'int': 'r13', 'char': 'r13', 'string': 'r13', 'listof': 'r13', '!': 'r13', '0': 'r13', '1': 'r13', '$': 'r13'}
+I105 : {'startmagic': 'r14', 'endmagic': 'r14', '+': 'r14', '-': 'r14', '=': 'r14', '*': 'r14', '^': 'r14', '/': 'r14', 'lt': 'r14', 'lte': 'r14', 'equals': 'r14', 'ne': 'r14', 'gte': 'r14', 'gt': 'r14', '(': 'r14', ')': 'r14', '[': 'r14', ']': 'r14', '{': 'r14', '}': 'r14', 'input': 'r14', 'echo': 'r14', 'gountil': 'r14', 'do': 'r14', 'incase': 'r14', 'then': 'r14', '~': 'r14', 'int': 'r14', 'char': 'r14', 'string': 'r14', 'listof': 'r14', '!': 'r14', '0': 'r14', '1': 'r14', '$': 'r14'}
+I106 : {'startmagic': 'r15', 'endmagic': 'r15', '+': 'r15', '-': 'r15', '=': 'r15', '*': 'r15', '^': 'r15', '/': 'r15', 'lt': 'r15', 'lte': 'r15', 'equals': 'r15', 'ne': 'r15', 'gte': 'r15', 'gt': 'r15', '(': 'r15', ')': 'r15', '[': 'r15', ']': 'r15', '{': 'r15', '}': 'r15', 'input': 'r15', 'echo': 'r15', 'gountil': 'r15', 'do': 'r15', 'incase': 'r15', 'then': 'r15', '~': 'r15', 'int': 'r15', 'char': 'r15', 'string': 'r15', 'listof': 'r15', '!': 'r15', '0': 'r15', '1': 'r15', '$': 'r15'}
+I107 : {'startmagic': 'r16', 'endmagic': 'r16', '+': 'r16', '-': 'r16', '=': 'r16', '*': 'r16', '^': 'r16', '/': 'r16', 'lt': 'r16', 'lte': 'r16', 'equals': 'r16', 'ne': 'r16', 'gte': 'r16', 'gt': 'r16', '(': 'r16', ')': 'r16', '[': 'r16', ']': 'r16', '{': 'r16', '}': 'r16', 'input': 'r16', 'echo': 'r16', 'gountil': 'r16', 'do': 'r16', 'incase': 'r16', 'then': 'r16', '~': 'r16', 'int': 'r16', 'char': 'r16', 'string': 'r16', 'listof': 'r16', '!': 'r16', '0': 'r16', '1': 'r16', '$': 'r16'}
+
+Parsing sequence: startmagic ( int ! 0 ~ ) endmagic
+
+Alpha | Beta | Phi
+~~~~~~~~~~~~~~~~~~~~
+0 | startmagic ( int ! 0 ~ ) endmagic $ | -
+0 startmagic2 | ( int ! 0 ~ ) endmagic $ | Shift 2
+0 startmagic2 (4 | int ! 0 ~ ) endmagic $ | Shift 4
+0 startmagic2 (4 int26 | ! 0 ~ ) endmagic $ | Shift 26
+0 startmagic2 (4 typel24 | ! 0 ~ ) endmagic $ | Reduced by typel->int
+0 startmagic2 (4 type22 | ! 0 ~ ) endmagic $ | Reduced by type->typel
+0 startmagic2 (4 type22 !51 | 0 ~ ) endmagic $ | Shift 51
+0 startmagic2 (4 type22 !51 070 | ~ ) endmagic $ | Shift 70
+0 startmagic2 (4 type22 !51 070 ~86 | ) endmagic $ | Shift 86
+0 startmagic2 (4 decl21 | ) endmagic $ | Reduced by decl->type!0~
+0 startmagic2 (4 decllist9 | ) endmagic $ | Reduced by decllist->decl
+0 startmagic2 (4 stmt6 | ) endmagic $ | Reduced by stmt->decllist
+0 startmagic2 (4 stmt6 )30 | endmagic $ | Shift 30
+0 startmagic2 cmpStmt3 | endmagic $ | Reduced by cmpStmt->(stmt)
+0 startmagic2 cmpStmt3 endmagic5 | $ | Shift 5
+0 program1 | $ | Reduced by program->startmagiccmpStmtendmagic
+0program1 | $ | Accept
+Success

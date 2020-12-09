@@ -118,9 +118,14 @@ class Lr0Parser(object):
             if non_terminal not in closure_history:
                 closure_history[non_terminal] = transition_history[non_terminal]
             else:
-                closure_history[non_terminal] += transition_history[non_terminal]
+                if type(transition_history[non_terminal]) == list:
+                    for t in transition_history[non_terminal]:
+                        if t not in closure_history[non_terminal]:
+                            closure_history[non_terminal].append(t)
+                # if transition_history[non_terminal] not in closure_history[non_terminal]:
+                #    closure_history[non_terminal] += transition_history[non_terminal]
             for transition in transition_history[non_terminal]:
-                #if non_terminal not in closure_history.keys():
+                # if transition not in closure_history[non_terminal]:
                 self.closure(transition, closure_history, transition_history)
 
     def shift_dot(self, transition_ref):
@@ -175,6 +180,7 @@ class Lr0Parser(object):
 
     def check_for_collision(self, value, where, new_value):
         if value is not None:
+            #pass
             raise Exception("Collision occured in the parsing table at: {}. Tried inserting {} over {}".format(where, new_value, value))
 
     def goto_all(self, state, initial_dotted, parent=-1, parent_transition="-1"):
@@ -307,13 +313,13 @@ class Lr0Parser(object):
         stack_alpha.append(alpha_item(0, -1))
 
         with open("out.txt", "a") as file:
-            self.print_and_write_to_file("Parsing sequence: {}\n".format("".join([x for x in word])), file)
+            self.print_and_write_to_file("Parsing sequence: {}\n".format(" ".join([x for x in word])), file)
             self.print_and_write_to_file("Alpha | Beta | Phi", file)
             self.print_and_write_to_file("~"*20, file)
             while(end != True):
-                self.print_and_write_to_file("{} | {} | {}".format("".join([str(x) for x in stack_alpha]),
-                                        "".join([x for x in reversed(stack_beta)]),
-                                        "-" if len(stack_phi)==0 else stack_phi[-1]),
+                self.print_and_write_to_file("{} | {} | {}".format(" ".join([str(x) for x in stack_alpha]),
+                                        " ".join([x for x in reversed(stack_beta)]),
+                                        "-" if len(stack_phi) == 0 else stack_phi[-1]),
                                              file)
                 current_step = stack_beta[-1]
                 current_state = stack_alpha[-1]
